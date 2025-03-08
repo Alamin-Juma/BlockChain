@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Transaction } from "ethereumjs-tx";
 import { Container, Card, Button, Form } from "react-bootstrap";
-import { ethers } from "ethers";
+import { ethers, getBytes } from "ethers";
+
+
 
 const SignTransaction: React.FC<{ privKey: string; ethAddress: string }> = ({ privKey, ethAddress }) => {
   const [signedLegacyTx, setSignedLegacyTx] = useState("");
@@ -21,8 +23,9 @@ const SignTransaction: React.FC<{ privKey: string; ethAddress: string }> = ({ pr
     };
 
     const tx = new Transaction(txData, { chain: "ropsten" });
-    const privateKeyUint8Array = ethers.utils.arrayify(privKey);
-    tx.sign(privateKeyUint8Array);
+    const privateKeyUint8Array = getBytes(privKey);
+    const privateKeyBuffer = Buffer.from(privateKeyUint8Array);
+    tx.sign(privateKeyBuffer);
     const signedTx = tx.serialize().toString("hex");
 
     setSignedLegacyTx(signedTx);
@@ -43,8 +46,9 @@ const SignTransaction: React.FC<{ privKey: string; ethAddress: string }> = ({ pr
     };
 
     const tx = new Transaction(txData, { chain: "ropsten" });
-    const privateKeyUint8Array = ethers.utils.arrayify(privKey);
-    tx.sign(privateKeyUint8Array);
+    const privateKeyUint8Array = getBytes(privKey);
+    const privateKeyBuffer = Buffer.from(privateKeyUint8Array);
+    tx.sign(privateKeyBuffer); 
     const signedTx = tx.serialize().toString("hex");
 
     setSignedEIP1559Tx(signedTx);
@@ -57,11 +61,11 @@ const SignTransaction: React.FC<{ privKey: string; ethAddress: string }> = ({ pr
         <Card.Body>
           <Card.Title className="text-center">Sign Transactions</Card.Title>
 
-          <div className="text-center mb-4">
-            <Button variant="primary" onClick={signLegacyTx}>
+          <div className="d-flex justify-content-center mb-3">
+            <Button variant="success" onClick={signLegacyTx} className="me-2">
               Sign Legacy Transaction
             </Button>
-            <Button variant="primary" onClick={signEIP1559Tx} className="ml-2">
+            <Button variant="warning" onClick={signEIP1559Tx} >
               Sign EIP1559 Transaction
             </Button>
           </div>
@@ -70,7 +74,7 @@ const SignTransaction: React.FC<{ privKey: string; ethAddress: string }> = ({ pr
             <Card className="mb-3">
               <Card.Body>
                 <Card.Title>Signed Legacy Transaction</Card.Title>
-                <Form.Control as="textarea" rows={3} value={signedLegacyTx} readOnly />
+                <Form.Control as="textarea" rows={2} value={signedLegacyTx} readOnly />
               </Card.Body>
             </Card>
           )}
@@ -88,7 +92,7 @@ const SignTransaction: React.FC<{ privKey: string; ethAddress: string }> = ({ pr
             <Card className="mb-3">
               <Card.Body>
                 <Card.Title>Signed EIP1559 Transaction</Card.Title>
-                <Form.Control as="textarea" rows={3} value={signedEIP1559Tx} readOnly />
+                <Form.Control as="textarea" rows={2} value={signedEIP1559Tx} readOnly />
               </Card.Body>
             </Card>
           )}
